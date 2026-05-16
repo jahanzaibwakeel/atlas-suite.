@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.env
+*.log
+backend/prisma/dev.db
+backend/prisma/dev.db-journal
+frontend/dist/
+*.tsbuildinfo
+frontend/vite.config.js
+frontend/vite.config.d.ts
