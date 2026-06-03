@@ -1,6 +1,7 @@
 import type { Request, RequestHandler } from "express";
 import { config } from "../config.js";
 import { getRateLimitRedis } from "../queues/rate-limit.redis.js";
+import { logger } from "../utils/logger.js";
 
 type RateLimitOptions = {
   keyPrefix: string;
@@ -52,7 +53,7 @@ export function createRateLimiter(options: RateLimitOptions): RequestHandler {
 
       next();
     } catch (error) {
-      console.error({ requestId: req.requestId, error }, "Rate limiter failed");
+      logger.error("rate_limiter_failed", { requestId: req.requestId, error });
 
       if (config.rateLimitFailOpen) {
         next();

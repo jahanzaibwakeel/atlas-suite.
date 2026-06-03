@@ -11,6 +11,7 @@ x-backend-env: &backend-env
   RATE_LIMIT_FAIL_OPEN: "true"
   UPLOAD_DIR: /app/uploads
   MAX_UPLOAD_BYTES: 5242880
+  LOG_LEVEL: info
   PORT: 4000
   FRONTEND_URL: http://localhost:5173
 

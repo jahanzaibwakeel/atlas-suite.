@@ -4,17 +4,18 @@ import { config } from "./config.js";
 import { prisma } from "./prisma.js";
 import { closeRateLimitRedis } from "./queues/rate-limit.redis.js";
 import { closeRealtime, initRealtime } from "./realtime/socket.js";
+import { logger } from "./utils/logger.js";
 
 const app = createApp();
 const server = createServer(app);
 initRealtime(server);
 
 server.listen(config.port, () => {
-  console.log(`AtlasSuite API listening on http://localhost:${config.port}`);
+  logger.info("api_server_started", { port: config.port });
 });
 
 async function shutdown(signal: string) {
-  console.log(`${signal} received. Shutting down API server.`);
+  logger.info("api_server_shutdown_started", { signal });
 
   server.close(async (error) => {
     await closeRealtime();
@@ -22,10 +23,11 @@ async function shutdown(signal: string) {
     await prisma.$disconnect();
 
     if (error) {
-      console.error(error);
+      logger.error("api_server_shutdown_failed", { error });
       process.exit(1);
     }
 
+    logger.info("api_server_shutdown_completed", { signal });
     process.exit(0);
   });
 }

@@ -240,6 +240,7 @@ Recommended learning deployment order:
 - [docs/22_PHASE_17_GITHUB_ACTIONS_CI_CD.md](docs/22_PHASE_17_GITHUB_ACTIONS_CI_CD.md)
 - [docs/23_PHASE_18_DEPLOYMENT_ARCHITECTURE.md](docs/23_PHASE_18_DEPLOYMENT_ARCHITECTURE.md)
 - [docs/24_PHASE_19_NGINX_REVERSE_PROXY.md](docs/24_PHASE_19_NGINX_REVERSE_PROXY.md)
+- [docs/25_PHASE_20_MONITORING_LOGGING_OBSERVABILITY.md](docs/25_PHASE_20_MONITORING_LOGGING_OBSERVABILITY.md)
 
 ## Current Status
 
@@ -264,9 +265,9 @@ Implemented:
 - GitHub Actions CI
 - Deployment architecture guide and production environment template
 - NGINX reverse proxy configuration
+- Structured logging, readiness checks, and basic runtime metrics
 
 Remaining roadmap:
 
-- monitoring, logging, observability
 - final security hardening
 - final scaling and system design review

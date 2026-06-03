@@ -1,26 +1,32 @@
 import { createEmailWorker, emailQueue } from "./queues/email.queue.js";
 import { prisma } from "./prisma.js";
+import { logger } from "./utils/logger.js";
 import { startOutboxDispatcher, stopOutboxDispatcher } from "./workers/outbox.dispatcher.js";
 
 const emailWorker = createEmailWorker();
 startOutboxDispatcher();
 
 emailWorker.on("completed", (job) => {
-  console.log(`[worker] completed ${job.name} ${job.id}`);
+  logger.info("worker_job_completed", { jobName: job.name, jobId: job.id });
 });
 
 emailWorker.on("failed", (job, error) => {
-  console.error(`[worker] failed ${job?.name ?? "unknown"} ${job?.id ?? "unknown"}`, error);
+  logger.error("worker_job_failed", {
+    jobName: job?.name ?? "unknown",
+    jobId: job?.id ?? "unknown",
+    error
+  });
 });
 
-console.log("[worker] Email worker started");
+logger.info("email_worker_started");
 
 async function shutdown(signal: string) {
-  console.log(`${signal} received. Shutting down workers.`);
+  logger.info("worker_shutdown_started", { signal });
   stopOutboxDispatcher();
   await emailWorker.close();
   await emailQueue.close();
   await prisma.$disconnect();
+  logger.info("worker_shutdown_completed", { signal });
   process.exit(0);
 }
 

@@ -1,10 +1,10 @@
 import "./types.js";
 import cors from "cors";
 import express from "express";
-import morgan from "morgan";
 import { config } from "./config.js";
 import adminRoutes from "./routes/admin.js";
 import authRoutes from "./routes/auth.js";
+import healthRoutes from "./routes/health.js";
 import jobRoutes from "./routes/jobs.js";
 import notificationRoutes from "./routes/notifications.js";
 import userRoutes from "./routes/users.js";
@@ -12,6 +12,7 @@ import { errorHandler } from "./middleware/error-handler.js";
 import { notFoundHandler } from "./middleware/not-found.js";
 import { parseCookies } from "./middleware/cookies.js";
 import { requestId } from "./middleware/request-id.js";
+import { requestLogger } from "./middleware/request-logger.js";
 
 export function createApp() {
   const app = express();
@@ -22,19 +23,8 @@ export function createApp() {
   app.use(cors({ origin: config.frontendUrl, credentials: true }));
   app.use(parseCookies);
   app.use(express.json({ limit: "1mb" }));
-  app.use(
-    morgan(":method :url :status :response-time ms - :res[content-length]", {
-      skip: (req) => req.path === "/health"
-    })
-  );
-
-  app.get("/health", (_req, res) => {
-    res.json({ status: "ok" });
-  });
-
-  app.get("/ready", (_req, res) => {
-    res.json({ status: "ready" });
-  });
+  app.use(requestLogger);
+  app.use(healthRoutes);
 
   app.use("/api/v1/auth", authRoutes);
   app.use("/api/v1/admin", adminRoutes);

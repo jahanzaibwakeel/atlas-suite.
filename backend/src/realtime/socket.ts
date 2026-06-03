@@ -6,6 +6,7 @@ import { createAdapter } from "@socket.io/redis-adapter";
 import { config } from "../config.js";
 import type { AuthUser } from "../types.js";
 import { parseRedisUrl } from "../queues/redis.js";
+import { logger } from "../utils/logger.js";
 
 let io: Server | undefined;
 let pubClient: Redis | undefined;
@@ -44,7 +45,11 @@ export function initRealtime(server: HttpServer) {
     const user = socket.data.user as AuthUser;
     socket.join(userRoom(user.id));
     socket.join(roleRoom(user.role));
-    console.log(`Realtime connected user=${user.id} role=${user.role} via ${redisUrl.hostname}`);
+    logger.info("realtime_client_connected", {
+      userId: user.id,
+      role: user.role,
+      redisHost: redisUrl.hostname
+    });
   });
 
   return io;

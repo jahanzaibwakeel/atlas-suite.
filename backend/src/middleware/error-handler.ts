@@ -1,6 +1,7 @@
 import type { ErrorRequestHandler } from "express";
 import { ZodError } from "zod";
 import { HttpError } from "../utils/http.js";
+import { logger } from "../utils/logger.js";
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
   const requestId = req.requestId;
@@ -28,7 +29,7 @@ export const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {
     return;
   }
 
-  console.error({ requestId, err });
+  logger.error("unhandled_request_error", { requestId, error: err });
   res.status(500).json({
     error: {
       code: "INTERNAL_SERVER_ERROR",
