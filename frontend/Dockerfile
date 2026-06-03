@@ -5,9 +5,9 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 
-COPY index.html ./
-COPY tsconfig*.json ./
-COPY vite.config.ts ./
+COPY tsconfig.json ./
+COPY next.config.mjs ./
+COPY next-env.d.ts ./
 COPY src ./src
 
 EXPOSE 5173

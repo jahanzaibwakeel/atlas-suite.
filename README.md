@@ -1,93 +1,181 @@
-# FieldOps
+# AtlasSuite
 
-FieldOps is a simplified field service management platform for a small company that schedules service jobs, assigns technicians, tracks progress, and gives clients visibility into their own work.
+AtlasSuite is a production-grade SaaS collaboration platform built as a full-stack engineering masterclass. The application is evolving from an earlier FieldOps codebase into an enterprise-style system with authentication, RBAC, PostgreSQL, Redis, REST APIs, background jobs, file uploads, realtime updates, Docker, and CI/CD-ready structure.
 
-## Stack
+The project is intentionally built in phases so every architectural choice can be studied, implemented, tested, and improved like a real product codebase.
 
-- Backend: Node.js, Express, TypeScript, Prisma
-- Database: SQLite
-- Frontend: React, Vite, TypeScript, TanStack Query
-- Auth: email/password login, bcrypt password hashing, JWT access tokens
+## Tech Stack
 
-SQLite is used through Prisma, so no separate database app is required. The local database is created as `backend/prisma/dev.db`.
+Frontend:
 
-## Local Setup
+- Next.js App Router
+- React
+- TypeScript
+- TanStack Query
+- Socket.IO client
+- CSS system in `frontend/src/styles.css`
 
-1. Copy the environment file:
+Backend:
 
-```bash
-copy .env.example backend\.env
-copy .env.example frontend\.env
+- Node.js
+- Express.js
+- TypeScript
+- Prisma ORM
+- JWT access tokens
+- Refresh-token session rotation
+- HttpOnly cookie authentication
+- RBAC policy layer
+- Socket.IO realtime gateway
+- BullMQ background jobs
+
+Data and infrastructure:
+
+- PostgreSQL as the durable system of record
+- Redis for queues, rate limits, and realtime scaling support
+- Docker and Docker Compose
+- Production Dockerfiles for backend and frontend
+
+## Project Structure
+
+```txt
+.
+├── backend/
+│   ├── prisma/
+│   │   ├── migrations/
+│   │   ├── schema.prisma
+│   │   └── seed.ts
+│   └── src/
+│       ├── app.ts
+│       ├── server.ts
+│       ├── middleware/
+│       ├── modules/
+│       │   ├── auth/
+│       │   ├── authorization/
+│       │   └── jobs/
+│       ├── queues/
+│       ├── realtime/
+│       ├── services/
+│       └── workers/
+├── frontend/
+│   └── src/
+│       ├── app/
+│       ├── auth/
+│       ├── api/
+│       ├── components/
+│       ├── realtime/
+│       └── views/
+├── docs/
+├── docker-compose.yml
+├── docker-compose.prod.yml
+└── ARCHITECTURE.md
 ```
 
-2. Install dependencies:
+## Prerequisites
 
-```bash
-npm.cmd install
-npm.cmd run install:all
+Install:
+
+- Node.js 24 or compatible modern Node version
+- npm
+- Docker Desktop
+- Git
+
+For the Docker workflow, Docker Desktop must be running with the Linux engine enabled.
+
+## Environment Setup
+
+Copy the shared example environment into backend and frontend environment files:
+
+```powershell
+Copy-Item .env.example backend\.env
+Copy-Item .env.example frontend\.env
 ```
 
-3. Create the database and run migrations:
+Important variables:
 
-```bash
-npm.cmd --prefix backend run migrate
-```
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | PostgreSQL connection string used by Prisma |
+| `REDIS_URL` | Redis connection string |
+| `JWT_SECRET` | Secret used to sign access tokens |
+| `JWT_ACCESS_TOKEN_TTL` | Short-lived access token duration |
+| `JWT_REFRESH_TOKEN_TTL_DAYS` | Refresh session lifetime |
+| `FRONTEND_URL` | Trusted browser origin for CORS and CSRF-style origin checks |
+| `NEXT_PUBLIC_API_URL` | Browser-visible API base URL |
+| `UPLOAD_DIR` | Backend upload storage directory |
 
-4. Seed demo data:
+Do not use the example secrets in production.
 
-```bash
-npm.cmd run seed
-```
+## Run With Docker
 
-5. Start the app:
+Docker is the recommended local workflow because it starts PostgreSQL, Redis, the backend API, the backend worker, and the Next.js frontend together.
 
-```bash
-npm.cmd run dev
-```
+Start the stack:
 
-The API runs on `http://localhost:4000`.
-The frontend runs on `http://localhost:5173`.
-
-## Docker Setup
-
-Docker is optional, but supported.
-
-1. Build and start the full local stack:
-
-```bash
+```powershell
 docker compose up --build
 ```
 
-2. Open the frontend:
+Open:
 
 ```txt
-http://localhost:5173
+Frontend: http://localhost:5173
+Backend health: http://localhost:4000/health
 ```
 
-The backend is available at:
+Stop the stack:
 
-```txt
-http://localhost:4000/health
-```
-
-The Docker setup runs the backend migration and seed commands automatically before starting the API. SQLite data is stored in a named Docker volume called `fieldops_sqlite`.
-
-To stop the stack:
-
-```bash
+```powershell
 docker compose down
 ```
 
-To reset the Docker database:
+Reset local Docker data:
 
-```bash
+```powershell
 docker compose down -v
 docker compose up --build
 ```
 
+The development Compose setup automatically runs backend migrations and seed data before starting the API.
+
+## Run Manually
+
+Use this path when you want to run Node processes directly on your machine. You still need PostgreSQL and Redis available.
+
+Install dependencies:
+
+```powershell
+npm install
+npm run install:all
+```
+
+Generate Prisma client and apply migrations:
+
+```powershell
+npm.cmd --prefix backend run migrate
+```
+
+Seed demo data:
+
+```powershell
+npm run seed
+```
+
+Start backend and frontend:
+
+```powershell
+npm run dev
+```
+
+The backend runs on `http://localhost:4000`.
+The frontend runs on `http://localhost:5173`.
+
 ## Demo Accounts
 
-All seeded accounts use the password `password123`.
+Seeded users share this password:
+
+```txt
+password123
+```
 
 | Role | Email |
 | --- | --- |
@@ -95,52 +183,119 @@ All seeded accounts use the password `password123`.
 | Technician | `tech@fieldops.test` |
 | Client | `client@fieldops.test` |
 
-## Environment Variables
+## Testing And Verification
 
-See `.env.example`.
+Backend tests:
 
-| Name | Purpose |
-| --- | --- |
-| `DATABASE_URL` | Prisma SQLite database URL |
-| `JWT_SECRET` | Secret used to sign JWT access tokens |
-| `PORT` | Backend API port |
-| `FRONTEND_URL` | Allowed CORS origin |
-| `VITE_API_URL` | Frontend API base URL |
+```powershell
+npm.cmd --prefix backend run test
+```
 
-## Assumptions
+Backend TypeScript build:
 
-- Registration is invite/admin-created rather than open. This is an internal business platform, so uncontrolled registration would be unsafe.
-- Admins create jobs, assign technicians, and schedule work.
-- Technicians can view only assigned jobs, add internal notes, and update assigned job status to `IN_PROGRESS`, `BLOCKED`, or `COMPLETED`.
-- Clients can view only their own jobs and public notes. They cannot update job status.
-- Technician availability is handled by the admin in v1. The system does not automatically prevent overlapping assignments.
-- Notifications are stored in-app instead of sent by email or SMS so the project runs locally without paid services.
-- Jobs are preserved. Important changes are recorded in `AuditLog`.
+```powershell
+npm.cmd --prefix backend run build
+```
 
-## Trade-offs
+Frontend production build:
 
-- SQLite keeps setup very simple. For production growth, PostgreSQL would be a better fit because of stronger concurrency, richer indexing, and operational tooling.
-- JWT access tokens are implemented without refresh tokens to keep the assessment focused. A production version should add refresh token rotation or secure server-side sessions.
-- Role-based access is enforced at the route level. Fine-grained permissions could be moved into a centralized policy layer as the system grows.
-- Notifications are synchronous database writes. A production version could use a queue for email, SMS, webhooks, and retries.
-- The frontend is functional and readable rather than heavily polished.
+```powershell
+npm.cmd --prefix frontend run build
+```
 
-## What Is Missing
+Prisma schema validation:
 
-- Docker Compose
-- Automated tests
-- Real email/SMS notifications
-- Technician availability calendar
-- Pagination and advanced filtering
-- Soft deletes and restore flow
-- Refresh token handling
+```powershell
+npm.cmd --prefix backend run prisma -- validate
+```
 
-## Main Flows
+Production Compose config validation:
 
-- Admin logs in, views overview metrics, creates a job, assigns a technician, and sees recent activity.
-- Technician logs in, views assigned jobs, updates status, and adds notes.
-- Client logs in and views their own job list.
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.prod.yml config
+```
+
+## Production Docker
+
+Build and run using production Docker overrides:
+
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
+```
+
+Production Dockerfiles use:
+
+- multi-stage builds
+- compiled TypeScript output
+- pruned dependency trees
+- non-root runtime users
+- no development watchers
+
+The backend production container runs:
+
+```bash
+npm run migrate && node dist/src/server.js
+```
+
+Because migrations run at container startup in this setup, Prisma CLI is kept as a production dependency. In a larger deployment, migrations can be moved into a separate release job.
+
+## API Overview
+
+Main backend responsibilities:
+
+- `/health` for service health
+- `/api/auth/*` for login, refresh, logout, verification, and password reset flows
+- `/api/jobs/*` for job/task collaboration workflows
+- `/api/users/*` and admin routes for user and role management
+- Socket.IO for realtime invalidation and collaboration events
+
+The core request flow is:
+
+```txt
+Frontend component
+  -> TanStack Query
+  -> API client
+  -> Express route
+  -> middleware
+  -> controller
+  -> service
+  -> policy/repository
+  -> Prisma
+  -> PostgreSQL
+  -> response DTO
+```
 
 ## Documentation
 
-Architecture details are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Start here:
+
+- [ARCHITECTURE.md](ARCHITECTURE.md)
+- [docs/00_MASTERCLASS_ROADMAP.md](docs/00_MASTERCLASS_ROADMAP.md)
+- [docs/01_TARGET_ARCHITECTURE.md](docs/01_TARGET_ARCHITECTURE.md)
+
+Phase notes:
+
+- `docs/02_*` through `docs/21_*` explain the project phase by phase.
+
+## Current Status
+
+Implemented so far:
+
+- PostgreSQL-backed Prisma schema
+- Express modular backend
+- JWT access tokens and refresh sessions
+- Secure cookie flow
+- Email verification and password reset foundations
+- RBAC and job-level policy authorization
+- Pagination, filtering, search, indexes, transactions
+- Redis-backed rate limiting
+- BullMQ queues and worker process
+- Outbox pattern
+- File uploads and attachments
+- Socket.IO realtime gateway with Redis adapter support
+- Next.js App Router frontend
+- TanStack Query frontend data layer
+- Backend tests with Vitest and Supertest
+- Development and production Docker setup
+
+Remaining roadmap includes CI/CD, deployment, NGINX reverse proxy, monitoring, and final production hardening.

@@ -5,6 +5,7 @@ dist/
 backend/prisma/dev.db
 backend/prisma/dev.db-journal
 frontend/dist/
+frontend/.next/
 *.tsbuildinfo
 frontend/vite.config.js
 frontend/vite.config.d.ts

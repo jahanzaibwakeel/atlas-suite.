@@ -1,6 +1,8 @@
 import { JobStatus, Role } from "@prisma/client";
 import { Router } from "express";
-import { requireAuth, requireRole } from "../middleware/auth.js";
+import { requireAuth } from "../middleware/auth.js";
+import { requirePermission } from "../middleware/authorize.js";
+import { Permission } from "../modules/authorization/permissions.js";
 import { prisma } from "../prisma.js";
 import { asyncHandler } from "../utils/http.js";
 
@@ -9,7 +11,7 @@ const router = Router();
 router.get(
   "/overview",
   requireAuth,
-  requireRole(Role.ADMIN),
+  requirePermission(Permission.AdminOverviewRead),
   asyncHandler(async (_req, res) => {
     const [totalJobs, usersByRole, jobsByStatus, recentActivity, upcomingJobs] =
       await Promise.all([

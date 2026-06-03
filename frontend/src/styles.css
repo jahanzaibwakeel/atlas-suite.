@@ -126,6 +126,7 @@ textarea {
 }
 
 .primary-button,
+.secondary-button,
 .demo-logins button,
 .note-compose button,
 .icon-button {
@@ -140,7 +141,16 @@ textarea {
   font-weight: 800;
 }
 
+.secondary-button {
+  min-height: 42px;
+  padding: 0 14px;
+  background: #e8f0eb;
+  color: #1f4d3d;
+  font-weight: 800;
+}
+
 .primary-button:disabled,
+.secondary-button:disabled,
 .note-compose button:disabled {
   opacity: 0.55;
   cursor: not-allowed;
@@ -324,10 +334,33 @@ textarea {
 .inline-controls {
   gap: 10px;
   margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.inline-controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 260px;
 }
 
 .inline-controls select {
   max-width: 230px;
+}
+
+.inline-controls button {
+  min-height: 42px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 6px;
+  background: #29382f;
+  color: white;
+  font-weight: 800;
+}
+
+.inline-controls button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .notes {
@@ -353,6 +386,23 @@ textarea {
   background: #29382f;
   color: white;
   font-weight: 800;
+}
+
+.file-upload {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  border-radius: 6px;
+  background: #eef4f0;
+  color: #29382f;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.file-upload input {
+  display: none;
 }
 
 @media (max-width: 780px) {

@@ -1,6 +1,8 @@
 import type { Prisma } from "@prisma/client";
 import { prisma } from "../prisma.js";
 
+type AuditDb = Pick<typeof prisma, "auditLog"> | Prisma.TransactionClient;
+
 export async function recordAudit(input: {
   actorId: string;
   action: string;
@@ -8,8 +10,8 @@ export async function recordAudit(input: {
   entityId: string;
   jobId?: string;
   metadata?: Prisma.InputJsonValue;
-}) {
-  return prisma.auditLog.create({
+}, db: AuditDb = prisma) {
+  return db.auditLog.create({
     data: {
       actorId: input.actorId,
       action: input.action,

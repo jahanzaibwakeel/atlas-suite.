@@ -1,23 +1,89 @@
+x-backend-env: &backend-env
+  DATABASE_URL: postgresql://atlas:atlas_dev_password@postgres:5432/atlas_suite?schema=public
+  REDIS_URL: redis://redis:6379
+  JWT_SECRET: change-me-in-local-development-at-least-32-chars
+  JWT_ACCESS_TOKEN_TTL: 15m
+  JWT_REFRESH_TOKEN_TTL_DAYS: 30
+  EMAIL_VERIFICATION_TOKEN_TTL_MINUTES: 60
+  PASSWORD_RESET_TOKEN_TTL_MINUTES: 15
+  QUEUE_PREFIX: atlas
+  TRUST_PROXY: "false"
+  RATE_LIMIT_FAIL_OPEN: "true"
+  UPLOAD_DIR: /app/uploads
+  MAX_UPLOAD_BYTES: 5242880
+  PORT: 4000
+  FRONTEND_URL: http://localhost:5173
+
 services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: atlas
+      POSTGRES_PASSWORD: atlas_dev_password
+      POSTGRES_DB: atlas_suite
+    ports:
+      - "5432:5432"
+    volumes:
+      - atlas_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U atlas -d atlas_suite"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - atlas_redis:/data
+    command: ["redis-server", "--appendonly", "yes"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   backend:
+    image: atlas-backend:dev
     build:
       context: ./backend
-    environment:
-      DATABASE_URL: file:/app/data/dev.db
-      JWT_SECRET: change-me-in-local-development
-      PORT: 4000
-      FRONTEND_URL: http://localhost:5173
+    environment: *backend-env
     ports:
       - "4000:4000"
     volumes:
-      - fieldops_sqlite:/app/data
+      - atlas_uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     command: sh -c "npm run migrate && npm run seed && npm run dev"
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://127.0.0.1:4000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  backend-worker:
+    image: atlas-backend:dev
+    environment: *backend-env
+    volumes:
+      - atlas_uploads:/app/uploads
+    depends_on:
+      backend:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: npm run worker
 
   frontend:
+    image: atlas-frontend:dev
     build:
       context: ./frontend
     environment:
-      VITE_API_URL: http://localhost:4000/api
+      NEXT_PUBLIC_API_URL: http://localhost:4000/api
     ports:
       - "5173:5173"
     depends_on:
@@ -25,4 +91,6 @@ services:
     command: npm run dev
 
 volumes:
-  fieldops_sqlite:
+  atlas_postgres:
+  atlas_redis:
+  atlas_uploads:

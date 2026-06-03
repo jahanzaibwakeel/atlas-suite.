@@ -24,6 +24,15 @@ export type JobNote = {
   author: Pick<User, "id" | "name" | "role">;
 };
 
+export type JobAttachment = {
+  id: string;
+  originalFilename: string;
+  mimeType: string;
+  sizeBytes: number;
+  createdAt: string;
+  uploadedBy: Pick<User, "id" | "name" | "role">;
+};
+
 export type Job = {
   id: string;
   title: string;
@@ -34,6 +43,7 @@ export type Job = {
   client: Pick<User, "id" | "name" | "email">;
   technician: Pick<User, "id" | "name" | "email"> | null;
   notes: JobNote[];
+  attachments: JobAttachment[];
 };
 
 export type Notification = {
@@ -43,4 +53,13 @@ export type Notification = {
   readAt: string | null;
   createdAt: string;
   jobId: string | null;
+};
+
+export type Pagination = {
+  page: number;
+  pageSize: number;
+  total: number;
+  totalPages: number;
+  hasNextPage: boolean;
+  hasPreviousPage: boolean;
 };
