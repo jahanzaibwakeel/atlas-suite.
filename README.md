@@ -276,6 +276,7 @@ Start here:
 Phase notes:
 
 - `docs/02_*` through `docs/21_*` explain the project phase by phase.
+- `docs/22_PHASE_17_GITHUB_ACTIONS_CI_CD.md` explains the CI/CD workflow.
 
 ## Current Status
 
@@ -297,5 +298,6 @@ Implemented so far:
 - TanStack Query frontend data layer
 - Backend tests with Vitest and Supertest
 - Development and production Docker setup
+- GitHub Actions CI for backend, frontend, Prisma, and Docker validation
 
-Remaining roadmap includes CI/CD, deployment, NGINX reverse proxy, monitoring, and final production hardening.
+Remaining roadmap includes deployment, NGINX reverse proxy, monitoring, final security hardening, and scaling review.
