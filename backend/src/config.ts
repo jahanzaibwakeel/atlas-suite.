@@ -17,7 +17,11 @@ const envSchema = z.object({
   RATE_LIMIT_FAIL_OPEN: z.coerce.boolean().default(true),
   UPLOAD_DIR: z.string().min(1).default("uploads"),
   MAX_UPLOAD_BYTES: z.coerce.number().int().positive().default(5 * 1024 * 1024),
-  LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info")
+  LOG_LEVEL: z.enum(["debug", "info", "warn", "error"]).default("info"),
+  COOKIE_DOMAIN: z.preprocess(
+    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+    z.string().min(1).optional()
+  )
 });
 
 const env = envSchema.parse(process.env);
@@ -39,5 +43,6 @@ export const config = {
   rateLimitFailOpen: env.RATE_LIMIT_FAIL_OPEN,
   uploadDir: env.UPLOAD_DIR,
   maxUploadBytes: env.MAX_UPLOAD_BYTES,
-  logLevel: env.LOG_LEVEL
+  logLevel: env.LOG_LEVEL,
+  cookieDomain: env.COOKIE_DOMAIN
 };

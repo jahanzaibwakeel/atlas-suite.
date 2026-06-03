@@ -12,6 +12,7 @@ x-backend-env: &backend-env
   UPLOAD_DIR: /app/uploads
   MAX_UPLOAD_BYTES: 5242880
   LOG_LEVEL: info
+  COOKIE_DOMAIN: ""
   PORT: 4000
   FRONTEND_URL: http://localhost:5173
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { api } from "../api/client";
+import { api, getAccessToken, setAccessToken } from "../api/client";
 import type { User } from "../types";
 
 type LoginResponse = {
@@ -24,9 +24,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const raw = localStorage.getItem("fieldops_user");
-    setUser(raw ? JSON.parse(raw) : null);
-    setReady(true);
+    let cancelled = false;
+
+    async function restoreSession() {
+      try {
+        const data = await api<LoginResponse>("/auth/refresh", { method: "POST" });
+
+        if (cancelled) {
+          return;
+        }
+
+        setAccessToken(data.accessToken ?? data.token);
+        setUser(data.user);
+      } catch {
+        if (!cancelled) {
+          setAccessToken(undefined);
+          setUser(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setReady(true);
+        }
+      }
+    }
+
+    void restoreSession();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const value = useMemo<AuthContextValue>(
@@ -38,14 +64,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           method: "POST",
           body: JSON.stringify({ email, password })
         });
-        localStorage.setItem("fieldops_token", data.accessToken ?? data.token);
-        localStorage.setItem("fieldops_user", JSON.stringify(data.user));
+        setAccessToken(data.accessToken ?? data.token);
         setUser(data.user);
       },
       async logout() {
         await api<void>("/auth/logout", { method: "POST" }).catch(() => undefined);
-        localStorage.removeItem("fieldops_token");
-        localStorage.removeItem("fieldops_user");
+        setAccessToken(undefined);
         setUser(null);
       }
     }),
@@ -53,6 +77,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAccessToken() {
+  return getAccessToken();
 }
 
 export function useAuth() {

@@ -241,6 +241,8 @@ Recommended learning deployment order:
 - [docs/23_PHASE_18_DEPLOYMENT_ARCHITECTURE.md](docs/23_PHASE_18_DEPLOYMENT_ARCHITECTURE.md)
 - [docs/24_PHASE_19_NGINX_REVERSE_PROXY.md](docs/24_PHASE_19_NGINX_REVERSE_PROXY.md)
 - [docs/25_PHASE_20_MONITORING_LOGGING_OBSERVABILITY.md](docs/25_PHASE_20_MONITORING_LOGGING_OBSERVABILITY.md)
+- [docs/26_PHASE_21_FINAL_SECURITY_HARDENING.md](docs/26_PHASE_21_FINAL_SECURITY_HARDENING.md)
+- [docs/27_PHASE_22_FINAL_SCALING_AND_SYSTEM_DESIGN_REVIEW.md](docs/27_PHASE_22_FINAL_SCALING_AND_SYSTEM_DESIGN_REVIEW.md)
 
 ## Current Status
 
@@ -266,8 +268,7 @@ Implemented:
 - Deployment architecture guide and production environment template
 - NGINX reverse proxy configuration
 - Structured logging, readiness checks, and basic runtime metrics
+- Final security hardening
+- Final scaling and system design review
 
-Remaining roadmap:
-
-- final security hardening
-- final scaling and system design review
+The core AtlasSuite full-stack architecture path is complete. Optional advanced phases can add OAuth, OpenAPI, Playwright E2E, S3-compatible file storage, OpenTelemetry, and Kubernetes.

@@ -1,5 +1,15 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000/api";
 
+let accessToken: string | undefined;
+
+export function setAccessToken(token: string | undefined) {
+  accessToken = token;
+}
+
+export function getAccessToken() {
+  return accessToken;
+}
+
 export class ApiError extends Error {
   status: number;
 
@@ -10,14 +20,13 @@ export class ApiError extends Error {
 }
 
 export async function api<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = localStorage.getItem("fieldops_token");
   const isFormData = options.body instanceof FormData;
   const response = await fetch(`${API_URL}${path}`, {
     ...options,
     credentials: "include",
     headers: {
       ...(!isFormData ? { "Content-Type": "application/json" } : {}),
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
       ...options.headers
     }
   });

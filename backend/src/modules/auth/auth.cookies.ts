@@ -9,6 +9,7 @@ export function setRefreshCookie(res: Response, token: string) {
     httpOnly: true,
     secure: config.isProduction,
     sameSite: "lax",
+    domain: config.cookieDomain,
     path: refreshCookiePath,
     maxAge: config.jwtRefreshTokenTtlDays * 24 * 60 * 60 * 1000
   });
@@ -19,6 +20,7 @@ export function clearRefreshCookie(res: Response) {
     httpOnly: true,
     secure: config.isProduction,
     sameSite: "lax",
+    domain: config.cookieDomain,
     path: refreshCookiePath
   });
 }

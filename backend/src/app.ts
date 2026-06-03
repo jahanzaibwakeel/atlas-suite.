@@ -13,6 +13,7 @@ import { notFoundHandler } from "./middleware/not-found.js";
 import { parseCookies } from "./middleware/cookies.js";
 import { requestId } from "./middleware/request-id.js";
 import { requestLogger } from "./middleware/request-logger.js";
+import { securityHeaders } from "./middleware/security-headers.js";
 
 export function createApp() {
   const app = express();
@@ -20,6 +21,7 @@ export function createApp() {
   app.disable("x-powered-by");
   app.set("trust proxy", config.trustProxy);
   app.use(requestId);
+  app.use(securityHeaders);
   app.use(cors({ origin: config.frontendUrl, credentials: true }));
   app.use(parseCookies);
   app.use(express.json({ limit: "1mb" }));

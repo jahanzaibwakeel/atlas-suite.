@@ -2,11 +2,12 @@
 
 import { useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../auth/AuthContext";
+import { useAccessToken, useAuth } from "../auth/AuthContext";
 import { connectRealtime, disconnectRealtime } from "./client";
 
 export function useRealtimeInvalidation() {
   const { user } = useAuth();
+  const token = useAccessToken();
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -15,7 +16,6 @@ export function useRealtimeInvalidation() {
       return;
     }
 
-    const token = localStorage.getItem("fieldops_token");
     if (!token) {
       return;
     }
@@ -34,5 +34,5 @@ export function useRealtimeInvalidation() {
     return () => {
       disconnectRealtime();
     };
-  }, [queryClient, user]);
+  }, [queryClient, token, user]);
 }
