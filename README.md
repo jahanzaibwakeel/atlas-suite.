@@ -1,10 +1,8 @@
 # AtlasSuite
 
-AtlasSuite is a production-grade SaaS collaboration platform built as a full-stack engineering masterclass. The application is evolving from an earlier FieldOps codebase into an enterprise-style system with authentication, RBAC, PostgreSQL, Redis, REST APIs, background jobs, file uploads, realtime updates, Docker, and CI/CD-ready structure.
+AtlasSuite is a production-grade SaaS collaboration platform built as a full-stack engineering masterclass. The codebase demonstrates enterprise patterns across frontend, backend, database, Redis, realtime, queues, Docker, CI, and deployment architecture.
 
-The project is intentionally built in phases so every architectural choice can be studied, implemented, tested, and improved like a real product codebase.
-
-## Tech Stack
+## Stack
 
 Frontend:
 
@@ -13,7 +11,6 @@ Frontend:
 - TypeScript
 - TanStack Query
 - Socket.IO client
-- CSS system in `frontend/src/styles.css`
 
 Backend:
 
@@ -25,91 +22,78 @@ Backend:
 - Refresh-token session rotation
 - HttpOnly cookie authentication
 - RBAC policy layer
+- BullMQ workers
 - Socket.IO realtime gateway
-- BullMQ background jobs
 
-Data and infrastructure:
+Infrastructure:
 
-- PostgreSQL as the durable system of record
-- Redis for queues, rate limits, and realtime scaling support
+- PostgreSQL
+- Redis
 - Docker and Docker Compose
-- Production Dockerfiles for backend and frontend
+- GitHub Actions CI
 
 ## Project Structure
 
 ```txt
 .
-├── backend/
-│   ├── prisma/
-│   │   ├── migrations/
-│   │   ├── schema.prisma
-│   │   └── seed.ts
-│   └── src/
-│       ├── app.ts
-│       ├── server.ts
-│       ├── middleware/
-│       ├── modules/
-│       │   ├── auth/
-│       │   ├── authorization/
-│       │   └── jobs/
-│       ├── queues/
-│       ├── realtime/
-│       ├── services/
-│       └── workers/
-├── frontend/
-│   └── src/
-│       ├── app/
-│       ├── auth/
-│       ├── api/
-│       ├── components/
-│       ├── realtime/
-│       └── views/
-├── docs/
-├── docker-compose.yml
-├── docker-compose.prod.yml
-└── ARCHITECTURE.md
+|-- backend/
+|   |-- prisma/
+|   |-- src/
+|   |   |-- middleware/
+|   |   |-- modules/
+|   |   |-- queues/
+|   |   |-- realtime/
+|   |   |-- services/
+|   |   |-- workers/
+|   |   |-- app.ts
+|   |   `-- server.ts
+|   `-- Dockerfile.prod
+|-- deployment/
+|-- frontend/
+|   |-- src/
+|   |   |-- app/
+|   |   |-- api/
+|   |   |-- auth/
+|   |   |-- components/
+|   |   |-- realtime/
+|   |   `-- views/
+|   `-- Dockerfile.prod
+|-- docs/
+|-- docker-compose.yml
+|-- docker-compose.prod.yml
+|-- ARCHITECTURE.md
+`-- README.md
 ```
 
 ## Prerequisites
-
-Install:
 
 - Node.js 24 or compatible modern Node version
 - npm
 - Docker Desktop
 - Git
 
-For the Docker workflow, Docker Desktop must be running with the Linux engine enabled.
+Docker Desktop must be running for the Docker workflow.
 
 ## Environment Setup
 
-Copy the shared example environment into backend and frontend environment files:
+Copy the local example environment:
 
 ```powershell
 Copy-Item .env.example backend\.env
 Copy-Item .env.example frontend\.env
 ```
 
-Important variables:
+For production, start from:
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_URL` | PostgreSQL connection string used by Prisma |
-| `REDIS_URL` | Redis connection string |
-| `JWT_SECRET` | Secret used to sign access tokens |
-| `JWT_ACCESS_TOKEN_TTL` | Short-lived access token duration |
-| `JWT_REFRESH_TOKEN_TTL_DAYS` | Refresh session lifetime |
-| `FRONTEND_URL` | Trusted browser origin for CORS and CSRF-style origin checks |
-| `NEXT_PUBLIC_API_URL` | Browser-visible API base URL |
-| `UPLOAD_DIR` | Backend upload storage directory |
+```txt
+.env.production.example
+```
 
-Do not use the example secrets in production.
+Never commit real production secrets.
 
 ## Run With Docker
 
-Docker is the recommended local workflow because it starts PostgreSQL, Redis, the backend API, the backend worker, and the Next.js frontend together.
-
-Start the stack:
+Docker is the easiest local workflow because it starts PostgreSQL, Redis, backend, worker, and frontend together.
 
 ```powershell
 docker compose up --build
@@ -122,7 +106,7 @@ Frontend: http://localhost:5173
 Backend health: http://localhost:4000/health
 ```
 
-Stop the stack:
+Stop:
 
 ```powershell
 docker compose down
@@ -135,20 +119,18 @@ docker compose down -v
 docker compose up --build
 ```
 
-The development Compose setup automatically runs backend migrations and seed data before starting the API.
-
 ## Run Manually
 
-Use this path when you want to run Node processes directly on your machine. You still need PostgreSQL and Redis available.
+Use this path when PostgreSQL and Redis are already running on your machine.
 
-Install dependencies:
+Install:
 
 ```powershell
 npm install
 npm run install:all
 ```
 
-Generate Prisma client and apply migrations:
+Run migrations:
 
 ```powershell
 npm.cmd --prefix backend run migrate
@@ -160,18 +142,15 @@ Seed demo data:
 npm run seed
 ```
 
-Start backend and frontend:
+Start:
 
 ```powershell
 npm run dev
 ```
 
-The backend runs on `http://localhost:4000`.
-The frontend runs on `http://localhost:5173`.
-
 ## Demo Accounts
 
-Seeded users share this password:
+Password:
 
 ```txt
 password123
@@ -183,7 +162,7 @@ password123
 | Technician | `tech@fieldops.test` |
 | Client | `client@fieldops.test` |
 
-## Testing And Verification
+## Verification
 
 Backend tests:
 
@@ -191,45 +170,41 @@ Backend tests:
 npm.cmd --prefix backend run test
 ```
 
-Backend TypeScript build:
+Backend build:
 
 ```powershell
 npm.cmd --prefix backend run build
 ```
 
-Frontend production build:
+Frontend build:
 
 ```powershell
 npm.cmd --prefix frontend run build
 ```
 
-Prisma schema validation:
+Prisma validation:
 
 ```powershell
-npm.cmd --prefix backend run prisma -- validate
+npm.cmd run prisma:validate
 ```
 
-Production Compose config validation:
+Production Compose validation:
 
 ```powershell
 docker compose -f docker-compose.yml -f docker-compose.prod.yml config
 ```
 
-## Production Docker
+NGINX Compose validation:
 
-Build and run using production Docker overrides:
+```powershell
+docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.nginx.yml config
+```
+
+## Production Docker
 
 ```powershell
 docker compose -f docker-compose.yml -f docker-compose.prod.yml up --build
 ```
-
-Production Dockerfiles use:
-
-- multi-stage builds
-- compiled TypeScript output
-- pruned dependency trees
-- non-root runtime users
-- no development watchers
 
 The backend production container runs:
 
@@ -237,50 +212,38 @@ The backend production container runs:
 npm run migrate && node dist/src/server.js
 ```
 
-Because migrations run at container startup in this setup, Prisma CLI is kept as a production dependency. In a larger deployment, migrations can be moved into a separate release job.
+Because migrations run during backend startup in this simple production Compose setup, Prisma CLI is kept as a production dependency. In larger systems, migrations usually move to a separate release job.
 
-## API Overview
+## Deployment
 
-Main backend responsibilities:
+Start with:
 
-- `/health` for service health
-- `/api/auth/*` for login, refresh, logout, verification, and password reset flows
-- `/api/jobs/*` for job/task collaboration workflows
-- `/api/users/*` and admin routes for user and role management
-- Socket.IO for realtime invalidation and collaboration events
+- [deployment/README.md](deployment/README.md)
+- [.env.production.example](.env.production.example)
+- [docs/23_PHASE_18_DEPLOYMENT_ARCHITECTURE.md](docs/23_PHASE_18_DEPLOYMENT_ARCHITECTURE.md)
 
-The core request flow is:
+Recommended learning deployment order:
 
-```txt
-Frontend component
-  -> TanStack Query
-  -> API client
-  -> Express route
-  -> middleware
-  -> controller
-  -> service
-  -> policy/repository
-  -> Prisma
-  -> PostgreSQL
-  -> response DTO
-```
+1. Docker Compose locally
+2. Docker Compose on a VPS
+3. Add NGINX and HTTPS
+4. Move PostgreSQL to managed database
+5. Move Redis to managed Redis
+6. Add automated CI/CD deployment
+7. Add monitoring and alerting
 
 ## Documentation
-
-Start here:
 
 - [ARCHITECTURE.md](ARCHITECTURE.md)
 - [docs/00_MASTERCLASS_ROADMAP.md](docs/00_MASTERCLASS_ROADMAP.md)
 - [docs/01_TARGET_ARCHITECTURE.md](docs/01_TARGET_ARCHITECTURE.md)
-
-Phase notes:
-
-- `docs/02_*` through `docs/21_*` explain the project phase by phase.
-- `docs/22_PHASE_17_GITHUB_ACTIONS_CI_CD.md` explains the CI/CD workflow.
+- [docs/22_PHASE_17_GITHUB_ACTIONS_CI_CD.md](docs/22_PHASE_17_GITHUB_ACTIONS_CI_CD.md)
+- [docs/23_PHASE_18_DEPLOYMENT_ARCHITECTURE.md](docs/23_PHASE_18_DEPLOYMENT_ARCHITECTURE.md)
+- [docs/24_PHASE_19_NGINX_REVERSE_PROXY.md](docs/24_PHASE_19_NGINX_REVERSE_PROXY.md)
 
 ## Current Status
 
-Implemented so far:
+Implemented:
 
 - PostgreSQL-backed Prisma schema
 - Express modular backend
@@ -298,6 +261,12 @@ Implemented so far:
 - TanStack Query frontend data layer
 - Backend tests with Vitest and Supertest
 - Development and production Docker setup
-- GitHub Actions CI for backend, frontend, Prisma, and Docker validation
+- GitHub Actions CI
+- Deployment architecture guide and production environment template
+- NGINX reverse proxy configuration
 
-Remaining roadmap includes deployment, NGINX reverse proxy, monitoring, final security hardening, and scaling review.
+Remaining roadmap:
+
+- monitoring, logging, observability
+- final security hardening
+- final scaling and system design review

@@ -99,6 +99,9 @@ jobs:
       - name: Validate production Compose config
         run: docker compose -f docker-compose.yml -f docker-compose.prod.yml config
 
+      - name: Validate NGINX Compose config
+        run: docker compose -f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.nginx.yml config
+
       - name: Build backend production image
         run: docker build -f backend/Dockerfile.prod -t atlas-backend:ci backend
 
