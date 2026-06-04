@@ -11,6 +11,7 @@ RUN npm ci
 
 COPY tsconfig.json ./
 COPY prisma ./prisma
+RUN npm run prisma -- generate
 COPY src ./src
 
 EXPOSE 4000
