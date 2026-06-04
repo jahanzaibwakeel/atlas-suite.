@@ -7,44 +7,44 @@ async function main() {
   const passwordHash = await bcrypt.hash("password123", 12);
 
   const admin = await prisma.user.upsert({
-    where: { email: "admin@fieldops.test" },
+    where: { email: "admin@atlas.test" },
     update: {},
     create: {
       name: "Amina Admin",
-      email: "admin@fieldops.test",
+      email: "admin@atlas.test",
       passwordHash,
       role: Role.ADMIN
     }
   });
 
   const technician = await prisma.user.upsert({
-    where: { email: "tech@fieldops.test" },
+    where: { email: "tech@atlas.test" },
     update: {},
     create: {
       name: "Tariq Technician",
-      email: "tech@fieldops.test",
+      email: "tech@atlas.test",
       passwordHash,
       role: Role.TECHNICIAN
     }
   });
 
   const secondTechnician = await prisma.user.upsert({
-    where: { email: "sana.tech@fieldops.test" },
+    where: { email: "sana.tech@atlas.test" },
     update: {},
     create: {
       name: "Sana Technician",
-      email: "sana.tech@fieldops.test",
+      email: "sana.tech@atlas.test",
       passwordHash,
       role: Role.TECHNICIAN
     }
   });
 
   const client = await prisma.user.upsert({
-    where: { email: "client@fieldops.test" },
+    where: { email: "client@atlas.test" },
     update: {},
     create: {
       name: "Bilal Client",
-      email: "client@fieldops.test",
+      email: "client@atlas.test",
       passwordHash,
       role: Role.CLIENT
     }

@@ -22,7 +22,7 @@ export function Workspace() {
     <main className="app-shell">
       <header className="topbar">
         <div>
-          <p className="eyebrow">FieldOps</p>
+          <p className="eyebrow">AtlasSuite</p>
           <h1>{user?.role === "ADMIN" ? "Operations Dashboard" : "My Jobs"}</h1>
         </div>
         <div className="topbar-actions">

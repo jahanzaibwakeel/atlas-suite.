@@ -3,8 +3,8 @@ import { Providers } from "./providers";
 import "../styles.css";
 
 export const metadata: Metadata = {
-  title: "FieldOps",
-  description: "Field service operations console"
+  title: "AtlasSuite",
+  description: "Enterprise collaboration operations console"
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

@@ -158,9 +158,9 @@ password123
 
 | Role | Email |
 | --- | --- |
-| Admin | `admin@fieldops.test` |
-| Technician | `tech@fieldops.test` |
-| Client | `client@fieldops.test` |
+| Admin | `admin@atlas.test` |
+| Technician | `tech@atlas.test` |
+| Client | `client@atlas.test` |
 
 ## Verification
 

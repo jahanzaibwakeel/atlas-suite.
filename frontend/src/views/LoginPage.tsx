@@ -6,14 +6,14 @@ import { useAuth } from "../auth/AuthContext";
 import { Button } from "../components/ui/Button";
 
 const demoUsers = [
-  ["Admin", "admin@fieldops.test"],
-  ["Technician", "tech@fieldops.test"],
-  ["Client", "client@fieldops.test"]
+  ["Admin", "admin@atlas.test"],
+  ["Technician", "tech@atlas.test"],
+  ["Client", "client@atlas.test"]
 ] as const;
 
 export function LoginPage() {
   const { login } = useAuth();
-  const [email, setEmail] = useState("admin@fieldops.test");
+  const [email, setEmail] = useState("admin@atlas.test");
   const [password, setPassword] = useState("password123");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -37,8 +37,8 @@ export function LoginPage() {
         <div className="brand">
           <BriefcaseBusiness size={30} />
           <div>
-            <h1>FieldOps</h1>
-            <p>Field service operations console</p>
+            <h1>AtlasSuite</h1>
+            <p>Enterprise collaboration operations console</p>
           </div>
         </div>
 
